@@ -1,0 +1,52 @@
+name: Build binaries
+
+on: [push]
+
+jobs:
+  win:
+    name: Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Run build
+        run: cargo build --release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: idlerpg-presence-windows
+          path: target/release/idlerpg-rich-presence
+
+  osx:
+    name: MacOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Run build
+        run: cargo build --release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: idlerpg-presence-mac
+          path: target/release/idlerpg-rich-presence
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Run build
+        run: cargo build --release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: idlerpg-presence-linux
+          path: target/release/idlerpg-rich-presence
