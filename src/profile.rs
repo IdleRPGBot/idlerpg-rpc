@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::time::{Duration, SystemTime};
+use std::time::{SystemTime, UNIX_EPOCH};
 use ureq::get;
 
 #[derive(Deserialize)]
@@ -31,13 +31,14 @@ impl ProfileData {
             None => String::from("Idling"),
         }
     }
-    pub fn get_time(&self) -> Option<(SystemTime, SystemTime)> {
+    pub fn get_time(&self) -> Option<(i64, i64)> {
         if let Some(adv) = &self.adventure {
             if adv.time_left > 0 {
-                let now = SystemTime::now();
-                let then = now
-                    .checked_add(Duration::from_secs(adv.time_left as u64))
-                    .unwrap();
+                let now = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs() as i64;
+                let then = now + adv.time_left;
                 Some((now, then))
             } else {
                 None
@@ -60,7 +61,7 @@ impl ProfileData {
     }
 }
 
-pub fn get_profile(user_id: &str) -> ProfileData {
+pub fn get_profile(user_id: i64) -> ProfileData {
     get(&format!("https://api.idlerpg.xyz/user?id={}", user_id))
         .call()
         .into_json_deserialize()

@@ -1,70 +1,91 @@
-name: Build binaries
+name: Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
-  win:
-    name: Windows
-    runs-on: windows-latest
+  build-test:
+    name: Build, test
+
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-apple-darwin
+          - i686-pc-windows-msvc
+          - x86_64-pc-windows-msvc
+        rust:
+          - nightly
+
+    runs-on: ${{ (contains(matrix.target, 'linux') && 'ubuntu-20.04') || (contains(matrix.target, 'apple') && 'macos-latest') || 'windows-latest'}}
 
     steps:
-      - name: Checkout sources
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install libclang
-        run: pacman -S mingw-w64-x86_64-clang
-
-      - name: Run build
-        run: cargo build --release
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: idlerpg-presence-windows
-          path: target/release/idlerpg-rich-presence
-
-  osx:
-    name: MacOS
-    runs-on: ubuntu-20.04
-
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
-
-      - name: Install osxcross
+      - name: Download Discord Game SDK
+        working-directory: ${{ runner.temp }}
         run: |
-          curl -sL https://github.com/natanbc/actions-binaries/releases/download/1/osxcross.tar.gz -o - | tar -xzf -
-          sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
-          sudo apt update
-          sudo apt install libssl1.0.0
+          curl -sO https://dl-game-sdk.discordapp.net/latest/discord_game_sdk.zip
+          unzip ./discord_game_sdk.zip
+          cp lib/x86_64/discord_game_sdk.so         lib/x86_64/libdiscord_game_sdk.so
+          cp lib/x86_64/discord_game_sdk.dylib      lib/x86_64/libdiscord_game_sdk.dylib
+          cp lib/x86_64/discord_game_sdk.dll.lib    lib/x86_64/discord_game_sdk.lib
+          cp lib/x86/discord_game_sdk.dll.lib       lib/x86/discord_game_sdk.lib
 
-      - name: Run build
+      - name: Set LD_LIBRARY_PATH
+        working-directory: ${{ runner.temp }}
+        if: contains(matrix.target, 'linux')
         run: |
-          export PATH="$PATH:$(pwd)/osxcross/bin"
-          export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$(pwd)/osxcross/lib"
-          export CC="x86_64-apple-darwin15-clang"
-          sudo rm -f /usr/bin/ld
-          sudo ln -s "$(pwd)/osxcross/bin/x86_64-apple-darwin15-ld" /usr/bin/ld
-          export LDFLAGS="-I$(pwd)/osxcross/SDK/MacOSX10.11.sdk"
-          rustup target add x86_64-apple-darwin
-          cargo build --release --target=x86_64-apple-darwin
+          echo "::set-env name=LD_LIBRARY_PATH::${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}$PWD/lib/x86_64"
 
-      - uses: actions/upload-artifact@v2
+      - name: Set DYLD_LIBRARY_PATH
+        working-directory: ${{ runner.temp }}
+        if: startsWith(runner.os, 'macos')
+        run: |
+          echo "::set-env name=DYLD_LIBRARY_PATH::${DYLD_LIBRARY_PATH:+${DYLD_LIBRARY_PATH}:}$PWD/lib/x86_64"
+
+      - name: Cache libclang
+        id: cache-libclang
+        if: startsWith(runner.os, 'windows')
+        uses: actions/cache@v1
         with:
-          name: idlerpg-presence-mac
-          path: target/x86_64-apple-darwin/idlerpg-rich-presence
+          path: 'C:\just-libclang'
+          key: windows-libclang
 
-  linux:
-    name: Linux
-    runs-on: ubuntu-20.04
+      - name: Install LLVM
+        if: startsWith(runner.os, 'windows') && steps.cache-libclang.outputs.cache-hit != 'true'
+        run: |
+          choco install llvm -r -y
+          mkdir 'C:\just-libclang'
+          cp 'C:\Program Files\LLVM\bin\libclang.dll' 'C:\just-libclang'
 
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
+      - name: Set LIBCLANG_PATH
+        if: startsWith(runner.os, 'windows')
+        run: |
+          echo '::set-env name=LIBCLANG_PATH::C:\just-libclang'
 
-      - name: Run build
-        run: cargo build --release
-
-      - uses: actions/upload-artifact@v2
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
         with:
-          name: idlerpg-presence-linux
-          path: target/release/idlerpg-rich-presence
+          profile: minimal
+          target: ${{ matrix.target }}
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --all --all-targets --target=${{ matrix.target }}
+        env:
+          DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: idlerpg-presence
+          path: target/*/idlerpg-rich-presence
