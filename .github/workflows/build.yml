@@ -8,7 +8,7 @@ on:
 
 jobs:
   linux:
-    name: Build
+    name: Linux
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -24,11 +24,6 @@ jobs:
           cp lib/x86_64/discord_game_sdk.dll.lib    lib/x86_64/discord_game_sdk.lib
           cp lib/x86/discord_game_sdk.dll.lib       lib/x86/discord_game_sdk.lib
 
-      - name: Set LD_LIBRARY_PATH
-        working-directory: ${{ runner.temp }}
-        run: |
-          echo "::set-env name=LD_LIBRARY_PATH::${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}$PWD/lib/x86_64"
-
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -40,7 +35,7 @@ jobs:
       - name: Build
         run: |
           export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}$PWD/lib/x86_64"
-          cargo build --all --all-targets --target=x86_64-unknown-linux-gnu
+          cargo build --release --all --all-targets --target=x86_64-unknown-linux-gnu
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
 
@@ -48,10 +43,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: idlerpg-presence
-          path: target/*/idlerpg-rich-presence
+          path: target/x86_64-unknown-linux-gnu/release/idlerpg-rich-presence
 
   macos:
-    name: Build
+    name: MacOS
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -78,7 +73,7 @@ jobs:
       - name: Build
         run: |
           export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH:+${DYLD_LIBRARY_PATH}:}$PWD/lib/x86_64"
-          cargo build --all --all-targets --target=x86_64-apple-darwin
+          cargo build --release --all --all-targets --target=x86_64-apple-darwin
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
 
@@ -86,10 +81,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: idlerpg-presence
-          path: target/*/idlerpg-rich-presence
+          path: target/x86_64-apple-darwin/release/idlerpg-rich-presence
 
   windows:
-    name: Build
+    name: Windows
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -130,8 +125,7 @@ jobs:
       - name: Build
         run: |
           export LIBCLANG_PATH="C:\just-libclang"
-          export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH:+${DYLD_LIBRARY_PATH}:}$PWD/lib/x86_64"
-          cargo build --all --all-targets --target=x86_64-pc-windows-msvc
+          cargo build --release --all --all-targets --target=x86_64-pc-windows-msvc
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
 
@@ -139,4 +133,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: idlerpg-presence
-          path: target/*/idlerpg-rich-presence
+          path: target/x86_64-pc-windows-msvc/release/idlerpg-rich-presence
