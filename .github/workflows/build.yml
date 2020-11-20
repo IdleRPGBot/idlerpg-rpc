@@ -38,6 +38,7 @@ jobs:
         run: |
           export PATH="$PATH:$(pwd)/osxcross/bin"
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$(pwd)/osxcross/lib"
+          export CC="x86_64-apple-darwin15-clang"
           rustup target add x86_64-apple-darwin
           cargo build --release --target=x86_64-apple-darwin
 
