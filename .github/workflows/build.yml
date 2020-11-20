@@ -11,6 +11,9 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
+      - name: Install libclang
+        run: pacman -S mingw-w64-x86_64-clang
+
       - name: Run build
         run: cargo build --release
 
@@ -39,6 +42,8 @@ jobs:
           export PATH="$PATH:$(pwd)/osxcross/bin"
           export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$(pwd)/osxcross/lib"
           export CC="x86_64-apple-darwin15-clang"
+          sudo rm -f /usr/bin/ld
+          sudo ln -s "$(pwd)/osxcross/bin/x86_64-apple-darwin15-ld" /usr/bin/ld
           rustup target add x86_64-apple-darwin
           cargo build --release --target=x86_64-apple-darwin
 
