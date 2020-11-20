@@ -21,19 +21,29 @@ jobs:
 
   osx:
     name: MacOS
-    runs-on: macos-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
 
+      - name: Install osxcross
+        run: |
+          curl -sL https://github.com/natanbc/actions-binaries/releases/download/1/osxcross.tar.gz -o - | tar -xzf -
+          sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
+          sudo apt update
+          sudo apt install libssl1.0.0
+
       - name: Run build
-        run: cargo build --release
+        run: |
+          export PATH="$PATH:$(pwd)/osxcross/bin"
+          export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$(pwd)/osxcross/lib"
+          cargo build --release --target=x86_64-apple-darwin
 
       - uses: actions/upload-artifact@v2
         with:
           name: idlerpg-presence-mac
-          path: target/release/idlerpg-rich-presence
+          path: target/x86_64-apple-darwin/idlerpg-rich-presence
 
   linux:
     name: Linux

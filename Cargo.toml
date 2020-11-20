@@ -8,5 +8,5 @@ edition = "2018"
 
 [dependencies]
 rustcord = { git = "https://github.com/tcyrus/rustcord/", branch = "patch-1" }
-ureq = { version = "1.5", features = ["json"] }
+ureq = { version = "1.5", default-features = false, features = ["tls", "json"] }
 serde = { version = "1", features = ["derive"] }
