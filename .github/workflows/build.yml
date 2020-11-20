@@ -124,10 +124,10 @@ jobs:
 
       - name: Build
         run: |
-          export LIBCLANG_PATH="C:\just-libclang"
           cargo build --release --all --all-targets --target=x86_64-pc-windows-msvc
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
+          LIBCLANG_PATH: "C:\just-libclang"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
