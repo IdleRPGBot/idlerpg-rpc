@@ -129,5 +129,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: idlerpg-presence-windows
-          path: target/release/idlerpg-rich-presence
+          name: idlerpg-presence-windows.exe
+          path: target/release/idlerpg-rich-presence.exe
