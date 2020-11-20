@@ -44,6 +44,7 @@ jobs:
           export CC="x86_64-apple-darwin15-clang"
           sudo rm -f /usr/bin/ld
           sudo ln -s "$(pwd)/osxcross/bin/x86_64-apple-darwin15-ld" /usr/bin/ld
+          export LDFLAGS="-I$(pwd)/osxcross/SDK/MacOSX10.11.sdk"
           rustup target add x86_64-apple-darwin
           cargo build --release --target=x86_64-apple-darwin
 
