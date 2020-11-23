@@ -32,7 +32,7 @@ jobs:
         run: |
           export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}$PWD/lib/x86_64"
           mkdir resources
-          cp lib/x86_64/libdiscord_game_sdk.so resources/
+          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.so resources/
           cargo build --release
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
@@ -70,7 +70,7 @@ jobs:
         run: |
           export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH:+${DYLD_LIBRARY_PATH}:}$PWD/lib/x86_64"
           mkdir resources
-          cp lib/x86_64/libdiscord_game_sdk.dylib resources/
+          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.dylib resources/
           cargo build --release
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
@@ -121,7 +121,7 @@ jobs:
       - name: Build
         run: |
           mkdir resources
-          cp lib/x86_64/discord_game_sdk.lib resources/
+          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/discord_game_sdk.lib resources/
           cargo build --release
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
