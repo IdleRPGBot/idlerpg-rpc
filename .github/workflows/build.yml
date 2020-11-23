@@ -41,7 +41,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: idlerpg-presence-linux
+          name: idlerpg-presence-linux.zip
           path: |
             idlerpg-rich-presence
             resources/
@@ -80,7 +80,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: idlerpg-presence-macos
+          name: idlerpg-presence-macos.zip
           path: |
             idlerpg-rich-presence
             resources/
@@ -133,7 +133,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: idlerpg-presence-windows.exe
+          name: idlerpg-presence-windows.zip
           path: |
             idlerpg-rich-presence.exe
             resources/
