@@ -34,6 +34,7 @@ jobs:
           mkdir resources
           cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.so resources/
           cargo build --release
+          cp target/release/idlerpg-rich-presence .
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
 
@@ -42,7 +43,7 @@ jobs:
         with:
           name: idlerpg-presence-linux
           path: |
-            target/release/idlerpg-rich-presence
+            idlerpg-rich-presence
             resources/
 
   macos:
@@ -72,6 +73,7 @@ jobs:
           mkdir resources
           cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.dylib resources/
           cargo build --release
+          cp target/release/idlerpg-rich-presence .
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
 
@@ -80,7 +82,7 @@ jobs:
         with:
           name: idlerpg-presence-macos
           path: |
-            target/release/idlerpg-rich-presence
+            idlerpg-rich-presence
             resources/
 
   windows:
@@ -121,8 +123,9 @@ jobs:
       - name: Build
         run: |
           mkdir resources
-          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/discord_game_sdk.lib resources/
+          cp $env:DISCORD_GAME_SDK_PATH/lib/x86_64/discord_game_sdk.lib resources/
           cargo build --release
+          cp target/release/idlerpg-rich-presence.exe .
         env:
           DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
           LIBCLANG_PATH: "C:\\just-libclang"
@@ -132,5 +135,5 @@ jobs:
         with:
           name: idlerpg-presence-windows.exe
           path: |
-            target/release/idlerpg-rich-presence.exe
+            idlerpg-rich-presence.exe
             resources/
