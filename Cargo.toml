@@ -10,3 +10,7 @@ edition = "2018"
 discord_game_sdk = "1.0"
 ureq = { version = "1.5", default-features = false, features = ["tls", "json"] }
 serde = { version = "1", features = ["derive"] }
+
+[profile.release]
+panic = "abort"
+lto = "thin"
