@@ -123,7 +123,7 @@ jobs:
       - name: Build
         run: |
           mkdir resources
-          cp $env:DISCORD_GAME_SDK_PATH/lib/x86_64/discord_game_sdk.dll resources/
+          cp $env:DISCORD_GAME_SDK_PATH/lib/x86_64/discord_game_sdk.dll .
           cargo build --release
           cp target/release/idlerpg-rich-presence.exe .
         env:
@@ -136,4 +136,4 @@ jobs:
           name: idlerpg-presence-windows
           path: |
             idlerpg-rich-presence.exe
-            resources/
+            discord_game_sdk.dll
