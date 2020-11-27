@@ -71,7 +71,7 @@ jobs:
         run: |
           export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH:+${DYLD_LIBRARY_PATH}:}$PWD/lib/x86_64"
           mkdir resources
-          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.dylib resources/
+          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.dylib resources/discord_game_sdk.dylib
           cargo build --release
           cp target/release/idlerpg-rich-presence .
         env:
