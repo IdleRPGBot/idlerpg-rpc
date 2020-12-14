@@ -12,6 +12,7 @@ struct Handler;
 
 impl EventHandler for Handler {
     fn on_current_user_update(&mut self, discord: &Discord<'_, Self>) {
+        println!("[UPDATER] Got data from Discord");
         unsafe {
             USER_ID = discord.current_user().unwrap().id();
         }
@@ -46,6 +47,7 @@ impl IdleRPGRPC<'_> {
     }
 
     fn main_loop(&mut self) {
+        println!("[LOOP] Waiting to get data from Discord...");
         loop {
             self.discord.run_callbacks().unwrap();
             sleep(REFRESH_INTERVAL);
@@ -54,15 +56,17 @@ impl IdleRPGRPC<'_> {
                 let activity = self.get_updated_activity();
                 self.discord.update_activity(&activity, |_, result| {
                     if let Err(error) = result {
-                        eprintln!("Failed to update activity: {}", error);
+                        eprintln!("[LOOP] Failed to update activity: {}", error);
                     }
                 });
+                println!("[LOOP] Updated presence");
             }
         }
     }
 }
 
 fn main() {
+    println!("[MAIN] Starting...")
     let mut app = IdleRPGRPC::new();
     app.main_loop();
 }
