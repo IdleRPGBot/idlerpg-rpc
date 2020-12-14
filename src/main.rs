@@ -66,7 +66,7 @@ impl IdleRPGRPC<'_> {
 }
 
 fn main() {
-    println!("[MAIN] Starting...")
+    println!("[MAIN] Starting...");
     let mut app = IdleRPGRPC::new();
     app.main_loop();
 }
