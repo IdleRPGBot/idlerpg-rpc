@@ -64,7 +64,8 @@ impl ProfileData {
 pub fn get_profile(user_id: i64) -> ProfileData {
     get(&format!("https://api.idlerpg.xyz/user?id={}", user_id))
         .call()
-        .into_json_deserialize()
+        .unwrap()
+        .into_json()
         .unwrap()
 }
 
