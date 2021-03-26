@@ -5,7 +5,7 @@ mod profile;
 
 const CLIENT_ID: i64 = 424606447867789312;
 const REFRESH_INTERVAL: Duration = Duration::from_millis(5000);
-static mut USER_ID: i64 = 0;
+pub static mut USER_ID: i64 = 0;
 
 #[derive(Default)]
 struct Handler;
@@ -39,12 +39,12 @@ impl IdleRPGRPC<'_> {
     }
 
     fn get_updated_activity(&self) -> Activity {
-        let profile_data = profile::get_profile(unsafe { USER_ID });
+        let profile_data = profile::get_profile();
         let mut activity_builder = Activity::empty();
         activity_builder.with_state(&profile_data.get_state());
         activity_builder.with_details(&profile_data.get_details());
         activity_builder.with_large_image_key("logo");
-        activity_builder.with_large_image_tooltip(&profile_data.get_big_image_text());
+        activity_builder.with_large_image_tooltip(profile_data.get_big_image_text());
         activity_builder.with_small_image_key(profile_data.get_small_image());
         activity_builder.with_small_image_tooltip(&profile_data.get_small_image_text());
         if let Some(time) = profile_data.get_time() {

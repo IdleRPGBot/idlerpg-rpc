@@ -1,15 +1,27 @@
-use serde::Deserialize;
-use std::time::{SystemTime, UNIX_EPOCH};
-use ureq::get;
+use crate::USER_ID;
 
-#[derive(Deserialize)]
+use nanoserde::DeJson;
+use once_cell::unsync::Lazy;
+use std::time::{SystemTime, UNIX_EPOCH};
+use ureq::Agent;
+use url::Url;
+
+const AGENT: Lazy<Agent> = Lazy::new(|| Agent::new());
+const URL: Lazy<Url> = Lazy::new(|| {
+    Url::parse(&format!("https://api.idlerpg.xyz/user?id={}", unsafe {
+        USER_ID
+    }))
+    .unwrap()
+});
+
+#[derive(DeJson)]
 pub struct AdventureData {
     pub done: bool,
     pub time_left: i64,
     pub number: u8,
 }
 
-#[derive(Deserialize)]
+#[derive(DeJson)]
 pub struct ProfileData {
     pub character_name: String,
     pub level: u8,
@@ -56,17 +68,19 @@ impl ProfileData {
     pub fn get_small_image_text(&self) -> String {
         format!("{}/{}", self.class[0], self.class[1])
     }
-    pub fn get_big_image_text(&self) -> String {
-        self.character_name.clone()
+    pub fn get_big_image_text(&self) -> &str {
+        &self.character_name
     }
 }
 
-pub fn get_profile(user_id: i64) -> ProfileData {
-    get(&format!("https://api.idlerpg.xyz/user?id={}", user_id))
+pub fn get_profile() -> ProfileData {
+    let body = AGENT
+        .request_url("GET", &URL)
         .call()
         .unwrap()
-        .into_json()
-        .unwrap()
+        .into_string()
+        .unwrap();
+    ProfileData::deserialize_json(&body).unwrap()
 }
 
 pub fn get_class_image(class: &str) -> &str {
