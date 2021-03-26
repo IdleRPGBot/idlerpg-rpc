@@ -1,5 +1,6 @@
 use crate::USER_ID;
 
+use discord_rpc_client::models::ActivityTimestamps;
 use nanoserde::DeJson;
 use once_cell::unsync::Lazy;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -43,15 +44,16 @@ impl ProfileData {
             None => String::from("Idling"),
         }
     }
-    pub fn get_time(&self) -> Option<(i64, i64)> {
+    pub fn get_time(&self) -> Option<ActivityTimestamps> {
         if let Some(adv) = &self.adventure {
             if adv.time_left > 0 {
                 let now = SystemTime::now()
                     .duration_since(UNIX_EPOCH)
                     .unwrap()
-                    .as_secs() as i64;
-                let then = now + adv.time_left;
-                Some((now, then))
+                    .as_secs() as u64;
+                let then = now + (adv.time_left as u64);
+                let ts = ActivityTimestamps::new().start(now).end(then);
+                Some(ts)
             } else {
                 None
             }
