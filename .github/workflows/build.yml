@@ -14,13 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Download Discord Game SDK
-        working-directory: ${{ runner.temp }}
-        run: |
-          curl -sO https://dl-game-sdk.discordapp.net/latest/discord_game_sdk.zip
-          unzip ./discord_game_sdk.zip
-          cp lib/x86_64/discord_game_sdk.so         lib/x86_64/libdiscord_game_sdk.so
-
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -30,13 +23,8 @@ jobs:
 
       - name: Build
         run: |
-          export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}$PWD/lib/x86_64"
-          mkdir resources
-          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.so resources/
           cargo build --release
           cp target/release/idlerpg-rich-presence .
-        env:
-          DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -44,7 +32,6 @@ jobs:
           name: idlerpg-presence-linux
           path: |
             idlerpg-rich-presence
-            resources/
 
   macos:
     name: MacOS
@@ -53,13 +40,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Download Discord Game SDK
-        working-directory: ${{ runner.temp }}
-        run: |
-          curl -sO https://dl-game-sdk.discordapp.net/latest/discord_game_sdk.zip
-          unzip ./discord_game_sdk.zip
-          cp lib/x86_64/discord_game_sdk.dylib      lib/x86_64/libdiscord_game_sdk.dylib
-
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -69,13 +49,8 @@ jobs:
 
       - name: Build
         run: |
-          export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH:+${DYLD_LIBRARY_PATH}:}$PWD/lib/x86_64"
-          mkdir resources
-          cp $DISCORD_GAME_SDK_PATH/lib/x86_64/libdiscord_game_sdk.dylib resources/discord_game_sdk.dylib
           cargo build --release
           cp target/release/idlerpg-rich-presence .
-        env:
-          DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -83,7 +58,6 @@ jobs:
           name: idlerpg-presence-macos
           path: |
             idlerpg-rich-presence
-            resources/
 
   windows:
     name: Windows
@@ -92,27 +66,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Download Discord Game SDK
-        working-directory: ${{ runner.temp }}
-        run: |
-          curl -sO https://dl-game-sdk.discordapp.net/latest/discord_game_sdk.zip
-          unzip ./discord_game_sdk.zip
-          cp lib/x86_64/discord_game_sdk.dll.lib    lib/x86_64/discord_game_sdk.lib
-
-      - name: Cache libclang
-        id: cache-libclang
-        uses: actions/cache@v1
-        with:
-          path: 'C:\just-libclang'
-          key: windows-libclang
-
-      - name: Install LLVM
-        if: steps.cache-libclang.outputs.cache-hit != 'true'
-        run: |
-          choco install llvm -r -y
-          mkdir 'C:\just-libclang'
-          cp 'C:\Program Files\LLVM\bin\libclang.dll' 'C:\just-libclang'
-
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -122,13 +75,8 @@ jobs:
 
       - name: Build
         run: |
-          mkdir resources
-          cp $env:DISCORD_GAME_SDK_PATH/lib/x86_64/discord_game_sdk.dll .
           cargo build --release
           cp target/release/idlerpg-rich-presence.exe .
-        env:
-          DISCORD_GAME_SDK_PATH: ${{ runner.temp }}
-          LIBCLANG_PATH: "C:\\just-libclang"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -136,4 +84,3 @@ jobs:
           name: idlerpg-presence-windows
           path: |
             idlerpg-rich-presence.exe
-            discord_game_sdk.dll
