@@ -50,8 +50,8 @@ impl ProfileData {
                 let now = SystemTime::now()
                     .duration_since(UNIX_EPOCH)
                     .unwrap()
-                    .as_secs() as i32;
-                let then = now + (adv.time_left as i32);
+                    .as_secs() as i64;
+                let then = now + adv.time_left;
                 let ts = Timestamps::new().start(now).end(then);
                 Some(ts)
             } else {
