@@ -20,11 +20,13 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
+          components: rust-src
 
       - name: Build
         run: |
-          cargo build --release
-          cp target/release/idlerpg-rich-presence .
+          cargo build --release --target=x86_64-unknown-linux-gnu
+          strip target/x86_64-unknown-linux-gnu/release/idlerpg-rich-presence
+          cp target/x86_64-unknown-linux-gnu/release/idlerpg-rich-presence .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -46,11 +48,13 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
+          components: rust-src
 
       - name: Build
         run: |
-          cargo build --release
-          cp target/release/idlerpg-rich-presence .
+          cargo build --release --target=x86_64-apple-darwin
+          strip target/x86_64-apple-darwin/release/idlerpg-rich-presence
+          cp target/x86_64-apple-darwin/release/idlerpg-rich-presence .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -72,11 +76,12 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
+          components: rust-src
 
       - name: Build
         run: |
-          cargo build --release
-          cp target/release/idlerpg-rich-presence.exe .
+          cargo build --release --target=x86_64-pc-windows-msvc
+          cp target/x86_64-pc-windows-msvc/release/idlerpg-rich-presence.exe .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
